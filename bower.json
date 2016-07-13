@@ -1,0 +1,29 @@
+{
+  "name": "ch-grid",
+  "version": "1.0.7",
+  "authors": [
+    "Gaithoben <gaithoben@gmail.com>"
+  ],
+  "description": "A grid based on the dxDataGrid.",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "grid"
+  ],
+  "main": "ch-grid.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/gaithoben/ch-grid/",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0",
+    "jquery": "2.2.3",
+    "devextreme": "^16.1.4"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "^4.0.0"
+  }
+}

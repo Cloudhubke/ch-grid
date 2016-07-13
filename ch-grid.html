@@ -1,0 +1,114 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="dx-light.html">
+<link rel="import" href="dx-common.html">
+
+
+<dom-module id="ch-grid">
+  <script src="../jquery/dist/jquery.min.js"></script>
+  <script src="../globalize/dist/globalize-runtime.js"></script>
+  <script src="../jszip/dist/jszip.min.js"></script>
+  <script src="../devextreme/js/dx.all.js"></script>
+
+  <template>
+    <div id="gridContainer"></div>
+  </template>
+</dom-module>
+
+  <script>
+    Polymer({
+      is: 'ch-grid',
+
+      properties: {
+        columns:{
+          type:Array,
+          value:['CompanyName', 'City', 'State', 'Phone', 'Fax']
+        },
+        datasource:{
+          type:Array,
+          value:[{CompanyName:'CloudHub', City:'Nairobi', State:'Kenya', Phone:'Nil', Fax:'Nil'}]
+        },
+        pgsize:{
+          type:Number,
+          value:10
+        },
+        search:{
+          type:Boolean,
+          value:true
+        },
+        exportenabled:{
+          type:Boolean,
+          value:true
+        },
+        exportname:{
+          type:String,
+          value:'gridexport'
+        }
+
+        },
+
+      ready: function() {
+
+      },
+
+      attached: function() {
+
+        $("#gridContainer").dxDataGrid({
+          dataSource: this.datasource,
+          columns: this.columns,
+          paging: {
+            pageSize: this.pgsize
+          },
+          pager: {
+            showPageSizeSelector: true,
+            allowedPageSizes: [5, 10, 20],
+            showInfo: true
+          },
+          allowColumnResizing: true,
+          columnChooser: { enabled: true },
+          allowColumnReordering: true,
+          sorting: { mode: 'multiple' },
+          groupPanel: { visible: true, emptyPanelText: 'Drag a column header here to group grid records' },
+          bindingOptions: {
+
+          },
+          searchPanel: { visible: this.search },
+          selection: { mode: 'multiple'},
+          export:{
+            enabled:this.exportenabled,
+            fileName:this.exportname,
+            allowExportSelectedData:true
+          }
+        });
+      },
+
+      detached: function() {
+        // The analog to `attached`, `detached` fires when the element has been
+        // removed from a document.
+        //
+        // Use this to clean up anything you did in `attached`.
+      },
+
+    });
+  </script>
+
+<style  is="custom-style" include="dx-common"></style>
+<style  is="custom-style" include="dx-light"></style>
+
+<style>
+  :host { display: block; }
+</style>
+
+
+
+
+
