@@ -24,82 +24,94 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 </dom-module>
 
-  <script>
-    Polymer({
-      is: 'ch-grid',
+<script>
+  var dg=null;
+  Polymer({
+    is: 'ch-grid',
 
-      properties: {
-        columns:{
-          type:Array,
-          value:['CompanyName', 'City', 'State', 'Phone', 'Fax']
+    properties: {
+      dg:{
+        type:Object
+      },
+      columns:{
+        type:Array,
+        value:['CompanyName', 'City', 'State'],
+        observer:'_columnsChanged'
+      },
+      datasource:{
+        type:Array,
+        value:[{CompanyName:'CloudHub', City:'Nairobi', State:'Kenya', Phone:'Nil', Fax:'Nil'}]
+      },
+      pgsize:{
+        type:Number,
+        value:10
+      },
+      search:{
+        type:Boolean,
+        value:true
+      },
+      exportenabled:{
+        type:Boolean,
+        value:true
+      },
+      exportname:{
+        type:String,
+        value:'gridexport'
+      }
+
+    },
+
+    ready: function() {
+
+    },
+
+    drawGrid:function () {
+      $("#gridContainer").dxDataGrid({
+        dataSource: this.datasource,
+        columns: this.columns,
+        paging: {
+          pageSize: this.pgsize
         },
-        datasource:{
-          type:Array,
-          value:[{CompanyName:'CloudHub', City:'Nairobi', State:'Kenya', Phone:'Nil', Fax:'Nil'}]
+        pager: {
+          showPageSizeSelector: true,
+          allowedPageSizes: [5, 10, 20],
+          showInfo: true
         },
-        pgsize:{
-          type:Number,
-          value:10
+        allowColumnResizing: true,
+        columnChooser: { enabled: true },
+        allowColumnReordering: true,
+        sorting: { mode: 'multiple' },
+        groupPanel: { visible: true, emptyPanelText: 'Drag a column header here to group grid records' },
+        bindingOptions: {
+
         },
-        search:{
-          type:Boolean,
-          value:true
-        },
-        exportenabled:{
-          type:Boolean,
-          value:true
-        },
-        exportname:{
-          type:String,
-          value:'gridexport'
+        searchPanel: { visible: this.search },
+        selection: { mode: 'multiple'},
+        export:{
+          enabled:this.exportenabled,
+          fileName:this.exportname,
+          allowExportSelectedData:true
         }
+      });
+    },
 
-        },
+    attached: function() {
+      this.drawGrid();
+    },
 
-      ready: function() {
+    _columnsChanged:function(){
+      this.drawGrid();
+    },
 
-      },
+    detached: function() {
+      // The analog to `attached`, `detached` fires when the element has been
+      // removed from a document.
+      //
+      // Use this to clean up anything you did in `attached`.
+    },
 
-      attached: function() {
-
-        $("#gridContainer").dxDataGrid({
-          dataSource: this.datasource,
-          columns: this.columns,
-          paging: {
-            pageSize: this.pgsize
-          },
-          pager: {
-            showPageSizeSelector: true,
-            allowedPageSizes: [5, 10, 20],
-            showInfo: true
-          },
-          allowColumnResizing: true,
-          columnChooser: { enabled: true },
-          allowColumnReordering: true,
-          sorting: { mode: 'multiple' },
-          groupPanel: { visible: true, emptyPanelText: 'Drag a column header here to group grid records' },
-          bindingOptions: {
-
-          },
-          searchPanel: { visible: this.search },
-          selection: { mode: 'multiple'},
-          export:{
-            enabled:this.exportenabled,
-            fileName:this.exportname,
-            allowExportSelectedData:true
-          }
-        });
-      },
-
-      detached: function() {
-        // The analog to `attached`, `detached` fires when the element has been
-        // removed from a document.
-        //
-        // Use this to clean up anything you did in `attached`.
-      },
-
-    });
-  </script>
+  });
+</script>
 
 <style  is="custom-style" include="dx-common"></style>
 <style  is="custom-style" include="dx-light"></style>
