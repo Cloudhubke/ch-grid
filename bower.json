@@ -20,7 +20,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0",
     "jquery": "2.2.3",
-    "devextreme": "^16.1.4"
+    "devextreme": "^16.1.4",
+    "ch-externallibraries": "cloudhubke/ch-externallibraries"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

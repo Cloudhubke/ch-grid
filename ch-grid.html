@@ -9,15 +9,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="dx-light.html">
-<link rel="import" href="dx-common.html">
+
+<link rel="import" href="../ch-externallibraries/jquery-2.2.3.html">
+<link rel="import" href="../ch-externallibraries/devextreme.html">
 
 
 <dom-module id="ch-grid">
-  <script src="../jquery/dist/jquery.min.js"></script>
-  <script src="../globalize/dist/globalize-runtime.js"></script>
-  <script src="../jszip/dist/jszip.min.js"></script>
-  <script src="../devextreme/js/dx.all.js"></script>
+  <style>
+    :host { display: block; }
+  </style>
 
   <template>
     <div id="gridContainer"></div>
@@ -66,7 +66,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     drawGrid:function () {
-      $("#gridContainer").dxDataGrid({
+      var node=this.$.gridContainer;
+
+      $(node).dxDataGrid({
         dataSource: this.datasource,
         columns: this.columns,
         paging: {
@@ -113,12 +115,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   });
 </script>
 
-<style  is="custom-style" include="dx-common"></style>
-<style  is="custom-style" include="dx-light"></style>
 
-<style>
-  :host { display: block; }
-</style>
+
 
 
 
