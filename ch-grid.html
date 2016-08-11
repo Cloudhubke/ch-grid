@@ -10,8 +10,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../polymer/polymer.html">
 
-<link rel="import" href="../ch-externallibraries/jquery-2.2.3.html">
+<script language="javascript" type="text/javascript">
+  var smartDonationsOldJQuery=jQuery;
+  var smartDonationsOldCashSign=$;
+</script>
+
+<script src="../jquery-2.2.3/index.js"></script>
 <link rel="import" href="../ch-externallibraries/devextreme.html">
+
+<script language="javascript" type="text/javascript">
+  var jq223=jQuery;
+  window.jQuery =smartDonationsOldJQuery;
+  window.$ = smartDonationsOldCashSign;
+
+  console.log(jQuery.fn.jquery);
+</script>
 
 
 <dom-module id="ch-grid">
@@ -20,100 +33,103 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </style>
 
   <template>
+
+
     <div id="gridContainer"></div>
   </template>
+  <script>
+    var dg=null;
+    Polymer({
+      is: 'ch-grid',
+
+      properties: {
+        dg:{
+          type:Object
+        },
+        columns:{
+          type:Array,
+          value:['CompanyName', 'City', 'State'],
+          observer:'_columnsChanged'
+        },
+        datasource:{
+          type:Array,
+          value:[{CompanyName:'CloudHub', City:'Nairobi', State:'Kenya', Phone:'Nil', Fax:'Nil'}]
+        },
+        pgsize:{
+          type:Number,
+          value:10
+        },
+        search:{
+          type:Boolean,
+          value:true
+        },
+        exportenabled:{
+          type:Boolean,
+          value:true
+        },
+        exportname:{
+          type:String,
+          value:'gridexport'
+        }
+
+      },
+
+      ready: function() {
+
+      },
+
+      drawGrid:function () {
+        var node=this.$.gridContainer;
+
+        jq223(node).dxDataGrid({
+          dataSource: this.datasource,
+          columns: this.columns,
+          paging: {
+            pageSize: this.pgsize
+          },
+          pager: {
+            showPageSizeSelector: true,
+            allowedPageSizes: [5, 10, 20],
+            showInfo: true
+          },
+          allowColumnResizing: true,
+          columnChooser: { enabled: true },
+          allowColumnReordering: true,
+          sorting: { mode: 'multiple' },
+          groupPanel: { visible: true, emptyPanelText: 'Drag a column header here to group grid records' },
+          bindingOptions: {
+
+          },
+          searchPanel: { visible: this.search },
+          selection: { mode: 'multiple'},
+          export:{
+            enabled:this.exportenabled,
+            fileName:this.exportname,
+            allowExportSelectedData:true
+          }
+        });
+      },
+
+      attached: function() {
+        this.drawGrid();
+      },
+
+      _columnsChanged:function(){
+        this.drawGrid();
+      },
+
+      detached: function() {
+        // The analog to `attached`, `detached` fires when the element has been
+        // removed from a document.
+        //
+        // Use this to clean up anything you did in `attached`.
+      },
+
+    });
+  </script>
 </dom-module>
 
-<script>
-  var dg=null;
-  Polymer({
-    is: 'ch-grid',
 
-    properties: {
-      dg:{
-        type:Object
-      },
-      columns:{
-        type:Array,
-        value:['CompanyName', 'City', 'State'],
-        observer:'_columnsChanged'
-      },
-      datasource:{
-        type:Array,
-        value:[{CompanyName:'CloudHub', City:'Nairobi', State:'Kenya', Phone:'Nil', Fax:'Nil'}]
-      },
-      pgsize:{
-        type:Number,
-        value:10
-      },
-      search:{
-        type:Boolean,
-        value:true
-      },
-      exportenabled:{
-        type:Boolean,
-        value:true
-      },
-      exportname:{
-        type:String,
-        value:'gridexport'
-      }
-
-    },
-
-    ready: function() {
-
-    },
-
-    drawGrid:function () {
-      var node=this.$.gridContainer;
-
-      $(node).dxDataGrid({
-        dataSource: this.datasource,
-        columns: this.columns,
-        paging: {
-          pageSize: this.pgsize
-        },
-        pager: {
-          showPageSizeSelector: true,
-          allowedPageSizes: [5, 10, 20],
-          showInfo: true
-        },
-        allowColumnResizing: true,
-        columnChooser: { enabled: true },
-        allowColumnReordering: true,
-        sorting: { mode: 'multiple' },
-        groupPanel: { visible: true, emptyPanelText: 'Drag a column header here to group grid records' },
-        bindingOptions: {
-
-        },
-        searchPanel: { visible: this.search },
-        selection: { mode: 'multiple'},
-        export:{
-          enabled:this.exportenabled,
-          fileName:this.exportname,
-          allowExportSelectedData:true
-        }
-      });
-    },
-
-    attached: function() {
-      this.drawGrid();
-    },
-
-    _columnsChanged:function(){
-      this.drawGrid();
-    },
-
-    detached: function() {
-      // The analog to `attached`, `detached` fires when the element has been
-      // removed from a document.
-      //
-      // Use this to clean up anything you did in `attached`.
-    },
-
-  });
-</script>
 
 
 
