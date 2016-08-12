@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   var smartDonationsOldCashSign=$;
 </script>
 
-<script src="../jquery-2.2.3/index.js"></script>
+<link rel="import" href="../ch-externallibraries/jquery-2.2.3.html">
 <link rel="import" href="../ch-externallibraries/devextreme.html">
 
 <script language="javascript" type="text/javascript">
@@ -34,17 +34,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-
+    <h2>{{title}}</h2>
     <div id="gridContainer"></div>
   </template>
   <script>
-    var dg=null;
     Polymer({
       is: 'ch-grid',
 
       properties: {
         dg:{
           type:Object
+        },
+        title:{
+          type:String,
+          value:'Data Grid'
         },
         columns:{
           type:Array,
@@ -81,7 +84,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       drawGrid:function () {
         var node=this.$.gridContainer;
 
-        jq223(node).dxDataGrid({
+        var grid = jq223(node).dxDataGrid({
           dataSource: this.datasource,
           columns: this.columns,
           paging: {
@@ -108,10 +111,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             allowExportSelectedData:true
           }
         });
+
       },
 
       attached: function() {
-        this.drawGrid();
+        //this.drawGrid();
       },
 
       _columnsChanged:function(){
@@ -128,13 +132,3 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
   </script>
 </dom-module>
-
-
-
-
-
-
-
-
-
-
