@@ -23,7 +23,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   window.jQuery =smartDonationsOldJQuery;
   window.$ = smartDonationsOldCashSign;
 
-  console.log(jQuery.fn.jquery);
 </script>
 
 
@@ -60,7 +59,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         pgsize:{
           type:Number,
-          value:10
+          value:50
         },
         search:{
           type:Boolean,
@@ -92,7 +91,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           pager: {
             showPageSizeSelector: true,
-            allowedPageSizes: [5, 10, 20],
+            allowedPageSizes: [100, 200, 500],
             showInfo: true
           },
           allowColumnResizing: true,
