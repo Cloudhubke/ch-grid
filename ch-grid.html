@@ -55,11 +55,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         datasource:{
           type:Array,
-          value:[{CompanyName:'CloudHub', City:'Nairobi', State:'Kenya', Phone:'Nil', Fax:'Nil'}]
+          observer:'_datachanged',
+          notify:true
+        },
+        datachanged:{
+          type:Boolean,
+          value:false
         },
         pgsize:{
           type:Number,
-          value:50
+          value:40
+        },
+        recordcount:{
+          type:Number,
+          value:0
         },
         search:{
           type:Boolean,
@@ -80,11 +89,80 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       },
 
-      drawGrid:function () {
+      _datachanged:function () {
+        var that=this;
+        this.datachanged=true;
+//        setTimeout(function () {
+//          console.log('New value', that.datachanged)
+//        }, 1000);
+      },
+
+      drawGrid:function (data, triggerchange) {
+        var that=this;
         var node=this.$.gridContainer;
 
+        var ds = {
+          load: function (loadOptions) {
+
+            var d = new jq223.Deferred();
+            var params = {};
+            var search = '';
+
+
+            //skip and take are used for paging
+            params.skip = loadOptions.skip; //A number of records that should be skipped
+            search = search + '?skip=' + params.skip;
+
+            params.limit = loadOptions.take; //A number of records that should be taken
+            search = search + '&limit=' + params.limit;
+
+
+            //Getting filter options
+            if (loadOptions.filter) {
+              var flt = JSON.stringify(loadOptions.filter);
+              flt = flt.split("\"", 6);
+              params.filter = flt[5];
+              search = search + '&filter=' + params.filter;
+            }
+            //Getting sort options
+            if (loadOptions.sort) {
+              params.sort = JSON.stringify(loadOptions.sort);
+              search = search + '&sort=' + params.sort;
+            }
+            //Getting dataField option
+            if (loadOptions.dataField) {
+              params.dataField = loadOptions.dataField;
+              search = search + '&dataField=' + params.dataField;
+            }
+
+            if (triggerchange == true) {
+              that.fire('paramschanged', search);
+            } else {
+              triggerchange = true;
+            }
+
+//            console.log('Reached', that.datachanged);
+            var interval = setInterval(function () {
+              if(that.datachanged==true){
+                d.resolve(that.datasource);
+                that.datachanged=false;
+                clearInterval(interval);
+              }
+            },100);
+            return d.promise();
+
+
+          },
+          totalCount: function (loadOptions) {
+            var d = new jq223.Deferred();
+            console.log('Hello', that.recordcount);
+            return that.recordcount;
+
+          }
+        };
+
         var grid = jq223(node).dxDataGrid({
-          dataSource: this.datasource,
+          dataSource: ds,
           columns: this.columns,
           paging: {
             pageSize: this.pgsize
@@ -104,6 +182,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           searchPanel: { visible: this.search },
           selection: { mode: 'multiple'},
+          onRowClick: function (info) {
+            that.fire('rowclicked', {data:info.data});
+          },
           export:{
             enabled:this.exportenabled,
             fileName:this.exportname,
@@ -112,13 +193,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
 
       },
-
       attached: function() {
-        //this.drawGrid();
+        this.drawGrid();
       },
 
       _columnsChanged:function(){
-        this.drawGrid();
+//        this.drawGrid();
       },
 
       detached: function() {
