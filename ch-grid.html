@@ -51,12 +51,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         columns:{
           type:Array,
           value:['CompanyName', 'City', 'State'],
-          observer:'_columnsChanged'
+          observer:'_changecols'
+        },
+        actualcolumns:{
+          type:Array,
+          value:[]
         },
         datasource:{
           type:Array,
-          observer:'_datachanged',
-          notify:true
+          observer:'_datachanged'
         },
         datachanged:{
           type:Boolean,
@@ -65,6 +68,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pgsize:{
           type:Number,
           value:40
+        },
+        pageindex:{
+          type:Number,
+          value:0
+        },
+        trigger:{
+          type:Boolean,
+          value:false
         },
         recordcount:{
           type:Number,
@@ -91,15 +102,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _datachanged:function () {
         var that=this;
+        this.trigger=false;
         this.datachanged=true;
-//        setTimeout(function () {
-//          console.log('New value', that.datachanged)
-//        }, 1000);
+
       },
 
-      drawGrid:function (data, triggerchange) {
+      drawGrid:function () {
         var that=this;
-        var node=this.$.gridContainer;
+
 
         var ds = {
           load: function (loadOptions) {
@@ -107,7 +117,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var d = new jq223.Deferred();
             var params = {};
             var search = '';
-
 
             //skip and take are used for paging
             params.skip = loadOptions.skip; //A number of records that should be skipped
@@ -135,34 +144,56 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               search = search + '&dataField=' + params.dataField;
             }
 
-            if (triggerchange == true) {
-              that.fire('paramschanged', search);
-            } else {
-              triggerchange = true;
+            that.pageindex = loadOptions.skip/loadOptions.take;
+            that.pgsize = loadOptions.take;
+
+
+
+            if(that.trigger==true){
+              if(params.skip!=undefined){
+                that.fire('paramschanged', search);
+              }
+
             }
 
-//            console.log('Reached', that.datachanged);
             var interval = setInterval(function () {
-              if(that.datachanged==true){
-                d.resolve(that.datasource);
-                that.datachanged=false;
+
+              if(that.datachanged==true) {
+
+                setTimeout(function () {
+                  d.resolve(that.datasource);
+                  that.datachanged = false;
+                  that.trigger = true;
+                },200)
+
                 clearInterval(interval);
               }
+
             },100);
+
             return d.promise();
-
-
           },
           totalCount: function (loadOptions) {
             var d = new jq223.Deferred();
             return that.recordcount;
 
+          },
+          remove: function(data) {
+            setTimeout(function () {
+              that.fire('delete', data);
+              setTimeout(function () {
+
+                that.drawGrid();
+              },1000)
+            },1000);
           }
         };
 
+
+        var node=this.$.gridContainer;
         var grid = jq223(node).dxDataGrid({
           dataSource: ds,
-          columns: this.columns,
+          columns: that.actualcolumns,
           paging: {
             pageSize: this.pgsize
           },
@@ -184,6 +215,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           onRowClick: function (info) {
             that.fire('rowclicked', {data:info.data});
           },
+          editing: {
+            mode: 'row',
+            allowDeleting: true,
+            texts: {
+              confirmDeleteMessage: 'Do you want to delete this record?'
+            }
+          },
           export:{
             enabled:this.exportenabled,
             fileName:this.exportname,
@@ -192,14 +230,78 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
 
       },
+
       attached: function() {
+
+      },
+
+      _changecols:function(){
+        var that=this;
+
+        var countercol=[{
+          caption: "#",
+          width:40,
+          cellTemplate: function (container, options) {
+            var counter = that.pageindex * that.pgsize + options.rowIndex + 1;
+            container.text(counter).appendTo(container);
+          }
+        }];
+
+        var actioncols=[{
+          caption: "Action",
+          width: 100,
+          cellTemplate: function(container, options) {
+
+            $("<i class='material-icons' style='font-size: 18px; cursor: pointer; margin-right: 10px;'>open_in_browser</i></a>").on(
+                    'click', function () {
+                      that.fire('view', options.data);
+                    }).addClass('actionlink') .appendTo(container);
+
+            $("<i class='material-icons' style='font-size: 18px; cursor: pointer; margin-right: 10px;'>edit</i></a>").on(
+                    'click', function () {
+                      that.fire('edit', options.data);
+                    }).addClass('actionlink').appendTo(container);
+
+            $("<i class='material-icons' style='font-size: 18px; cursor: pointer;'>clear</i></a>").on(
+                    'click', function (){
+                      that.deleterow(options.rowIndex);//
+                    }).addClass('actionlinkdelete') .appendTo(container);
+
+          }
+        }];
+
+
+        var cols = this.columns;
+
+        cols.forEach(function (cl) {
+          countercol.push(cl);
+        });
+
+        actioncols.forEach(function (col) {
+          countercol.push(col);
+        });
+
+        this.actualcolumns =   countercol;
         this.drawGrid();
       },
 
-      _columnsChanged:function(){
-//        this.drawGrid();
-      },
+      refresh:function() {
+        var that = this;
+        var node = this.$.gridContainer;
+        var grid = jq223(node).dxDataGrid('instance');
+        that.trigger=true;
+        that.datachanged=true;
 
+        setTimeout(function () {
+          that.drawGrid();
+        })
+      },
+      deleterow:function (i) {
+        var node=this.$.gridContainer;
+        var grid = jq223(node).dxDataGrid('instance');
+
+        grid.deleteRow(i);
+      },
       detached: function() {
         // The analog to `attached`, `detached` fires when the element has been
         // removed from a document.
@@ -210,4 +312,3 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
   </script>
 </dom-module>
-
