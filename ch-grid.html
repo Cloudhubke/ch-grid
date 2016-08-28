@@ -135,8 +135,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             //Getting sort options
             if (loadOptions.sort) {
+
               params.sort = JSON.stringify(loadOptions.sort);
-              search = search + '&sort=' + params.sort;
+              var sort={};
+              sort[loadOptions.sort[0].selector]=loadOptions.sort[0].desc==true?-1:1;
+
+              search = search + '&sort=' + JSON.stringify(sort);
             }
             //Getting dataField option
             if (loadOptions.dataField) {
@@ -312,3 +316,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
   </script>
 </dom-module>
+
+
+
+
+
+
+
+
+
+
