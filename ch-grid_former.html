@@ -16,7 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </script>
 
 <link rel="import" href="../ch-externallibraries/jquery-2.2.3.html">
-<link rel="import" href="../ch-externallibraries/dxdatagrid.html">
+<link rel="import" href="../ch-externallibraries/devextreme.html">
 
 <script language="javascript" type="text/javascript">
   var jq223=jQuery;
@@ -104,6 +104,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var that=this;
         this.trigger=false;
         this.datachanged=true;
+
       },
 
       drawGrid:function () {
@@ -159,14 +160,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             }
 
-            setTimeout(function () {
+            var interval = setInterval(function () {
 
-              d.resolve(that.datasource);
-              that.datachanged = false;
-              that.trigger = true;
+              if(that.datachanged==true) {
 
+                setTimeout(function () {
+                  d.resolve(that.datasource);
+                  that.datachanged = false;
+                  that.trigger = true;
+                },200)
 
-            },200);
+                clearInterval(interval);
+              }
+
+            },100);
 
             return d.promise();
           },
@@ -176,7 +183,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           },
           remove: function(data) {
-            that.datachanged=true;
+            setTimeout(function () {
+              that.fire('delete', data);
+              setTimeout(function () {
+
+                that.drawGrid();
+              },1000)
+            },1000);
           }
         };
 
@@ -209,7 +222,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           editing: {
             mode: 'row',
             texts: {
-              confirmDeleteMessage: ''
+              confirmDeleteMessage: 'Do you want to delete this record?'
             }
           },
           export:{
@@ -254,7 +267,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             $("<i class='material-icons' style='font-size: 18px; cursor: pointer;'>clear</i></a>").on(
                     'click', function (){
-                      that.deleterow(options.rowIndex, options.data);//
+                      that.deleterow(options.rowIndex);//
                     }).addClass('actionlinkdelete') .appendTo(container);
 
           }
@@ -281,30 +294,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var grid = jq223(node).dxDataGrid('instance');
         that.trigger=true;
         that.datachanged=true;
-        grid.refresh();
 
+        setTimeout(function () {
+          that.drawGrid();
+        })
       },
-      deleterow:function (i,data) {
+      deleterow:function (i) {
         var node=this.$.gridContainer;
-        var that= this;
         var grid = jq223(node).dxDataGrid('instance');
-        var result = DevExpress.ui.dialog.confirm("Do you want to delete this record?", "Please Confirm");
-        result.done(function (dialogResult) {
-          if(dialogResult){
-            that.trigger=true;
 
-            that.fire('delete', data);
-
-            setTimeout(function () {
-              grid.deleteRow(i);
-            },500)
-          };
-        });
-
-
-//        if(showConfirm()){
-//
-//        }
+        grid.deleteRow(i);
       },
       detached: function() {
         // The analog to `attached`, `detached` fires when the element has been
